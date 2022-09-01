@@ -2,10 +2,11 @@ import { UserFactory } from './../../database/factories/index'
 import Factory from '@ioc:Adonis/Lucid/Factory'
 import test from 'japa'
 import supertest from 'supertest'
+import Database from '@ioc:Adonis/Lucid/Database'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`
 
-test.group('User', () => {
+test.group('User', (group) => {
   test('it should create an user', async (assert) => {
     const userPayload = {
       email: 'hiago@gmail.com',
@@ -35,5 +36,12 @@ test.group('User', () => {
         password: 'teste',
       })
       .expect(409)
+  })
+
+  group.beforeEach(async () => {
+    await Database.beginGlobalTransaction()
+  })
+  group.afterEach(async () => {
+    await Database.rollbackGlobalTransaction()
   })
 })
