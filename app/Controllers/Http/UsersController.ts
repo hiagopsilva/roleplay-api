@@ -1,7 +1,12 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import User from 'App/Models/User'
 
 export default class UsersController {
-  public async store({ response }: HttpContextContract) {
-    return response.status(201).json({ ok: true })
+  public async store({ request, response }: HttpContextContract) {
+    const userPayload = request.only(['email', 'username', 'password', 'avatar'])
+
+    const user = await User.create(userPayload)
+
+    return response.status(201).created({ user })
   }
 }
