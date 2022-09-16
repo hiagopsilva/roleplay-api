@@ -19,15 +19,17 @@ export default class UsersController {
   }
 
   public async update({ request, response, auth }: HttpContextContract) {
-    // const userPayload = await request.validate(CreateUser)
+    const { email, password, avatar } = request.only(['email', 'avatar', 'password'])
+    const id = request.param('id')
 
-    // const user = await User.findOrFail(auth.user?.id)
+    const user = await User.findOrFail(id)
 
-    // user.merge(userPayload)
+    user.email = email
+    user.password = password
+    if (avatar) user.avatar = avatar
 
-    // await user.save()
+    await user.save()
 
-    // return response.ok({ user })
-    return response.ok({})
+    return response.ok({ user })
   }
 }
