@@ -17,4 +17,17 @@ export default class UsersController {
 
     return response.status(201).created({ user })
   }
+
+  public async update({ request, response, auth }: HttpContextContract) {
+    // const userPayload = await request.validate(CreateUser)
+
+    // const user = await User.findOrFail(auth.user?.id)
+
+    // user.merge(userPayload)
+
+    // await user.save()
+
+    // return response.ok({ user })
+    return response.ok({})
+  }
 }
