@@ -92,7 +92,7 @@ test.group('User', (group) => {
     assert.equal(body.status, 422)
   })
 
-  test.only('it should updated an user', async (assert) => {
+  test('it should updated an user', async (assert) => {
     const { id, password } = await UserFactory.create()
 
     const email = 'test@teste.com'
@@ -124,6 +124,14 @@ test.group('User', (group) => {
 
     await user.refresh()
     assert.isTrue(await Hash.verify(user.password, password))
+  })
+
+  test.only('it should return 422 when required data is not provided', async (assert) => {
+    const { id } = await UserFactory.create()
+    const { body } = await supertest(BASE_URL).put(`/users/${id}`).send({}).expect(422)
+
+    assert.equal(body.code, 'BAD_REQUEST')
+    assert.equal(body.status, 422)
   })
 
   group.beforeEach(async () => {
