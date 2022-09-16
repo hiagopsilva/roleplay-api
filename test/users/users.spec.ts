@@ -2,6 +2,7 @@ import { UserFactory } from './../../database/factories/index'
 import test from 'japa'
 import supertest from 'supertest'
 import Database from '@ioc:Adonis/Lucid/Database'
+import Hash from '@ioc:Adonis/Core/Hash'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`
 
@@ -105,7 +106,24 @@ test.group('User', (group) => {
     assert.exists(body.user, 'User undefined')
     assert.exists(body.user.email, email)
     assert.exists(body.user.avatar, avatar)
-    assert.exists(body.user.id, id)
+    assert.exists(body.user.id, String(id))
+  })
+
+  test('it should update the password of the user', async (assert) => {
+    const user = await UserFactory.create()
+
+    const password = 'test'
+
+    const { body } = await supertest(BASE_URL)
+      .put(`/users/${user.id}`)
+      .send({ email: user.email, avatar: user.avatar, password })
+      .expect(200)
+
+    assert.exists(body.user, 'User undefined')
+    assert.exists(body.user.id, String(user.id))
+
+    await user.refresh()
+    assert.isTrue(await Hash.verify(user.password, password))
   })
 
   group.beforeEach(async () => {

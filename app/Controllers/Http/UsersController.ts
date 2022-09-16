@@ -18,7 +18,7 @@ export default class UsersController {
     return response.status(201).created({ user })
   }
 
-  public async update({ request, response, auth }: HttpContextContract) {
+  public async update({ request, response }: HttpContextContract) {
     const { email, password, avatar } = request.only(['email', 'avatar', 'password'])
     const id = request.param('id')
 
