@@ -5,6 +5,7 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import Hash from '@ioc:Adonis/Core/Hash'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`
+let token = ''
 
 test.group('User', (group) => {
   test('it should create an user', async (assert) => {
@@ -100,6 +101,7 @@ test.group('User', (group) => {
 
     const { body } = await supertest(BASE_URL)
       .put(`/users/${id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send({ email, avatar, password })
       .expect(200)
 
@@ -117,6 +119,7 @@ test.group('User', (group) => {
     const { body } = await supertest(BASE_URL)
       .put(`/users/${user.id}`)
       .send({ email: user.email, avatar: user.avatar, password })
+      .set('Authorization', `Bearer ${token}`)
       .expect(200)
 
     assert.exists(body.user, 'User undefined')
@@ -128,7 +131,11 @@ test.group('User', (group) => {
 
   test('it should return 422 when required data is not provided', async (assert) => {
     const { id } = await UserFactory.create()
-    const { body } = await supertest(BASE_URL).put(`/users/${id}`).send({}).expect(422)
+    const { body } = await supertest(BASE_URL)
+      .put(`/users/${id}`)
+      .send({})
+      .set('Authorization', `Bearer ${token}`)
+      .expect(422)
 
     assert.equal(body.code, 'BAD_REQUEST')
     assert.equal(body.status, 422)
@@ -139,6 +146,7 @@ test.group('User', (group) => {
     const { body } = await supertest(BASE_URL)
       .put(`/users/${id}`)
       .send({ password, avatar, email: 'test@' })
+      .set('Authorization', `Bearer ${token}`)
       .expect(422)
 
     assert.equal(body.code, 'BAD_REQUEST')
@@ -150,6 +158,7 @@ test.group('User', (group) => {
     const { body } = await supertest(BASE_URL)
       .put(`/users/${id}`)
       .send({ email, avatar, password: '123' })
+      .set('Authorization', `Bearer ${token}`)
       .expect(422)
 
     assert.equal(body.code, 'BAD_REQUEST')
@@ -161,10 +170,21 @@ test.group('User', (group) => {
     const { body } = await supertest(BASE_URL)
       .put(`/users/${id}`)
       .send({ email, password, avatar: 'test' })
+      .set('Authorization', `Bearer ${token}`)
       .expect(422)
 
     assert.equal(body.code, 'BAD_REQUEST')
     assert.equal(body.status, 422)
+  })
+
+  group.before(async () => {
+    const { email } = await UserFactory.merge({ password: 'test' }).create()
+    const { body } = await supertest(BASE_URL)
+      .post('/sessions')
+      .send({ email, password: 'test' })
+      .expect(201)
+
+    token = body.token.token
   })
 
   group.beforeEach(async () => {

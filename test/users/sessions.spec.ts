@@ -4,6 +4,7 @@ import test from 'japa'
 import supertest from 'supertest'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`
+let token = ''
 
 test.group('Session', async (group) => {
   test('it should authenticate an user', async (assert) => {
