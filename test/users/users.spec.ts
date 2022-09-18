@@ -11,7 +11,7 @@ test.group('User', (group) => {
     const userPayload = {
       email: 'hiago@gmail.com',
       username: 'hiago',
-      password: '123',
+      password: '1234',
     }
 
     const { body } = await supertest(BASE_URL).post('/users').send(userPayload).expect(201)

@@ -49,7 +49,7 @@ test.group('Session', async (group) => {
     assert.equal(body.message, 'invalid credentials')
   })
 
-  test('it should return 200 when user sings out', async (assert) => {
+  test('it should return 200 when user sings out', async () => {
     const { email } = await UserFactory.merge({ password: 'test' }).create()
     const { body } = await supertest(BASE_URL)
       .post('/sessions')
@@ -64,7 +64,7 @@ test.group('Session', async (group) => {
       .expect(200)
   })
 
-  test.only('it should revoke token when user sings out', async (assert) => {
+  test('it should revoke token when user sings out', async (assert) => {
     const { email } = await UserFactory.merge({ password: 'test' }).create()
     const { body } = await supertest(BASE_URL)
       .post('/sessions')
