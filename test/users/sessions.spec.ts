@@ -14,8 +14,6 @@ test.group('Session', async (group) => {
       .send({ email, password: plainPassword })
       .expect(201)
 
-    console.log({ body })
-
     assert.isDefined(body.user, 'user undefined')
     assert.equal(body.user.id, id)
   })
