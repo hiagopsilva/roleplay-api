@@ -3,9 +3,11 @@ import test from 'japa'
 import supertest from 'supertest'
 import Database from '@ioc:Adonis/Lucid/Database'
 import Hash from '@ioc:Adonis/Core/Hash'
+import User from 'App/Models/User'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`
 let token = ''
+let user = {} as User
 
 test.group('User', (group) => {
   test('it should create an user', async (assert) => {
@@ -25,14 +27,12 @@ test.group('User', (group) => {
   })
 
   test('it should return 409 when email is already in use', async (assert) => {
-    const { email } = await UserFactory.create()
-
     const { body } = await supertest(BASE_URL)
       .post('/users')
       .send({
-        email,
-        username: 'teste',
-        password: 'teste',
+        email: user.email,
+        username: user.username,
+        password: user.password,
       })
       .expect(409)
 
@@ -94,26 +94,22 @@ test.group('User', (group) => {
   })
 
   test('it should updated an user', async (assert) => {
-    const { id, password } = await UserFactory.create()
-
     const email = 'test@teste.com'
     const avatar = 'http://github.com/hiagopsilva.png'
 
     const { body } = await supertest(BASE_URL)
-      .put(`/users/${id}`)
+      .put(`/users/${user.id}`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ email, avatar, password })
+      .send({ email, avatar, password: user.password })
       .expect(200)
 
     assert.exists(body.user, 'User undefined')
     assert.exists(body.user.email, email)
     assert.exists(body.user.avatar, avatar)
-    assert.exists(body.user.id, String(id))
+    assert.exists(body.user.id, String(user.id))
   })
 
   test('it should update the password of the user', async (assert) => {
-    const user = await UserFactory.create()
-
     const password = 'test'
 
     const { body } = await supertest(BASE_URL)
@@ -178,13 +174,15 @@ test.group('User', (group) => {
   })
 
   group.before(async () => {
-    const { email } = await UserFactory.merge({ password: 'test' }).create()
+    const newUser = await UserFactory.merge({ password: 'test' }).create()
     const { body } = await supertest(BASE_URL)
       .post('/sessions')
-      .send({ email, password: 'test' })
+      .send({ email: newUser.email, password: 'test' })
       .expect(201)
 
     token = body.token.token
+
+    user = newUser
   })
 
   group.beforeEach(async () => {

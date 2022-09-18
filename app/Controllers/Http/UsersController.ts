@@ -5,7 +5,7 @@ import CreateUser from 'App/Validators/CreateUserValidator'
 import UpdateUserValidator from 'App/Validators/UpdateUserValidator'
 
 export default class UsersController {
-  public async store({ request, response }: HttpContextContract) {
+  public async store({ request, response, bouncer }: HttpContextContract) {
     const userPayload = await request.validate(CreateUser)
 
     const userByEmail = await User.findBy('email', userPayload.email)
@@ -19,11 +19,13 @@ export default class UsersController {
     return response.status(201).created({ user })
   }
 
-  public async update({ request, response }: HttpContextContract) {
+  public async update({ request, response, bouncer }: HttpContextContract) {
     const { email, password, avatar } = await request.validate(UpdateUserValidator)
     const id = request.param('id')
 
     const user = await User.findOrFail(id)
+
+    await bouncer.authorize('updateUser', user)
 
     user.email = email
     user.password = password
