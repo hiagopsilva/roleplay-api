@@ -32,4 +32,8 @@ export default class PasswordsController {
 
     return response.status(204).noContent()
   }
+
+  public async resetPassword({ request, response }: HttpContextContract) {
+    return response.noContent()
+  }
 }
