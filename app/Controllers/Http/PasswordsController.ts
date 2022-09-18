@@ -28,6 +28,7 @@ export default class PasswordsController {
           resetPasswordUrl: resetPasswordUrlWithToken,
         })
     })
+
     return response.status(204).noContent()
   }
 }

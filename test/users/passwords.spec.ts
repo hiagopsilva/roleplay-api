@@ -42,8 +42,6 @@ test.group('password', (group) => {
 
     const tokens = await user.related('tokens').query()
 
-    console.log({ tokens })
-
     assert.isNotEmpty(tokens)
   })
 
