@@ -22,6 +22,7 @@ test.group('Group', async (group) => {
     assert.exists(body.group, 'Group undefined')
     assert.equal(body.group.name, groupPayload.name)
     assert.equal(body.group.description, groupPayload.description)
+    assert.equal(body.group.schedule, groupPayload.schedule)
     assert.equal(body.group.location, groupPayload.location)
     assert.equal(body.group.chronic, groupPayload.chronic)
     assert.equal(body.group.master, groupPayload.master)
